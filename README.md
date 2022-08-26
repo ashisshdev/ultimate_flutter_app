@@ -30,6 +30,13 @@ box change effect or circular effect ..
 ThemeSwitcher.of(context).changeTheme(theme: allThemes[name]);
 
 
+Notes of go_router
+
+
+next step is to implement reposonsiveness using this
+https://pub.dev/packages/flutter_screenutil
+https://dhruvnakum.xyz/how-to-make-a-pixel-perfect-flutter-application
+
 
 ----------------
 

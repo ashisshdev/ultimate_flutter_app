@@ -29,23 +29,29 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # dependency injection, routing and stateManagement
   get_it: ^7.2.0
+  go_router: ^4.2.8
   provider: ^6.0.3
+
+  # offline storages
   shared_preferences: ^2.0.15
 
+  # ui packages
   introduction_screen: ^3.0.2
-
-  flutter_native_splash: ^2.1.5
   animated_theme_switcher: ^2.0.6
-  go_router: ^4.2.8
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # helpers to avoid touching native code
+  flutter_native_splash: ^2.1.5
+
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: ^0.10.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -62,6 +68,21 @@ flutter_native_splash:
   android: true
   ios: true
   web: true
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo/logo_dark.png"
+  web:
+    generate: true
+    image_path: "assets/logo/logo_dark.png"
+    background_color: "#DAD7C2"
+    theme_color: "#133337"
+  windows:
+    generate: true
+    image_path: "assets/logo/logo_dark.png"
+    icon_size: 48 # min:48, max:256, default: 48
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

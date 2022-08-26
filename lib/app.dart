@@ -9,37 +9,7 @@ import 'package:ultimate_flutter_app/3_controllers/homepage_provider.dart';
 import 'package:ultimate_flutter_app/4_ui/shared/themeicon_widget.dart';
 import 'package:ultimate_flutter_app/4_ui/theme/themes_data.dart';
 import 'package:ultimate_flutter_app/dependency_injection.dart';
-
-final goRouter = GoRouter(
-  debugLogDiagnostics: true,
-  initialLocation: locator<SharedPreferencesHelper>().getIsUserFirstTime()
-      ? '/'
-      : locator<SharedPreferencesHelper>().getIsUserLoggedIn() || locator<SharedPreferencesHelper>().getAnonymousLogIn()
-          ? 'home'
-          : 'login',
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const WelcomePage(),
-    ),
-    GoRoute(
-      path: 'login',
-      builder: (context, state) => const LoginPage(),
-    ),
-    GoRoute(
-      path: 'home',
-      builder: (context, state) => const HomePage(),
-    ),
-    GoRoute(
-      path: 'modal',
-      builder: (context, state) => const HomePage2(),
-    ),
-    GoRoute(
-      path: 'modal',
-      builder: (context, state) => const HomePage3(),
-    ),
-  ],
-);
+import 'package:ultimate_flutter_app/utils/routes.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -51,7 +21,7 @@ class MyApp extends StatelessWidget {
   getCurrentTheme() {
     String? themeName = locator<SharedPreferencesHelper>().getTheme();
     if (themeName == null) {
-      final isPlatformDark = WidgetsBinding.instance!.window.platformBrightness == Brightness.dark;
+      final isPlatformDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
       themeName = isPlatformDark ? 'light' : 'dark';
     }
     return allThemes[themeName];
@@ -71,6 +41,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp.router(
               routeInformationParser: goRouter.routeInformationParser,
               routerDelegate: goRouter.routerDelegate,
+              routeInformationProvider: goRouter.routeInformationProvider,
               theme: theme
 
               /// now here we will decide if user is first time and loggedIn or anonynosmy loggedIn or what
@@ -116,8 +87,8 @@ class WelcomePage extends StatelessWidget {
                     if (value) {
                       locator<SharedPreferencesHelper>().getIsUserLoggedIn() ||
                               locator<SharedPreferencesHelper>().getAnonymousLogIn()
-                          ? Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()))
-                          : Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
+                          ? context.goNamed(allRoutes[AppPaths.home]!)
+                          : context.goNamed(allRoutes[AppPaths.login]!);
                     }
                   });
                 },
@@ -158,8 +129,7 @@ class LoginPage extends StatelessWidget {
                           locator<SharedPreferencesHelper>().setAnonymousLogIn(loggedIn: false);
                           locator<SharedPreferencesHelper>().setUserToken("someUserToken").then((value) {
                             if (value) {
-                              Navigator.of(context)
-                                  .pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+                              context.goNamed(allRoutes[AppPaths.home]!);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                   content: Text("Login success but "
@@ -182,13 +152,86 @@ class LoginPage extends StatelessWidget {
                       /// if he creates an account in future then his data will be sent to server
                       locator<SharedPreferencesHelper>().setAnonymousLogIn(loggedIn: true).then((value) {
                         if (value) {
-                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+                          context.goNamed(allRoutes[AppPaths.home]!);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error")));
                         }
                       });
                     },
-                    child: Text("Anonymous Login"))
+                    child: Text("Anonymous Login")),
+                SizedBox(
+                  height: 150,
+                ),
+                TextButton(
+                    onPressed: () {
+                      context.pushNamed(allRoutes[AppPaths.signin]!);
+                    },
+                    child: Text("Create an account?"))
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class SignInPage extends StatelessWidget {
+  const SignInPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("SignIn Page"),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Center(
+            child: Column(
+              children: [
+                TextButton(
+                    onPressed: () {
+                      /// after login/signIn  Process set isLogged = true
+                      /// also save some user Token
+                      locator<SharedPreferencesHelper>().setIsUserLoggedIn(loggedIn: true).then((value) {
+                        if (value) {
+                          locator<SharedPreferencesHelper>().setAnonymousLogIn(loggedIn: false);
+                          locator<SharedPreferencesHelper>()
+                              .setUserToken("someNewUserToken - yes new signUp")
+                              .then((value) {
+                            if (value) {
+                              context.goNamed(allRoutes[AppPaths.home]!);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text("Login success but "
+                                      "user token not saved successfully ")));
+                            }
+                          });
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error while login")));
+                        }
+                      });
+                    },
+                    child: Text("Login\n(email,phone,google,facebook,twitter etc..)")),
+                SizedBox(
+                  height: 50,
+                ),
+                //   TextButton(
+                //       onPressed: () {
+                //         /// set anonymous true and save all user data locally
+                //         /// no user token will be saved
+                //         /// if he creates an account in future then his data will be sent to server
+                //         locator<SharedPreferencesHelper>().setAnonymousLogIn(loggedIn: true).then((value) {
+                //           if (value) {
+                //             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+                //           } else {
+                //             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error")));
+                //           }
+                //         });
+                //       },
+                //       child: Text("Anonymous Login"))
               ],
             ),
           )
@@ -203,132 +246,428 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final homePageProvider = Provider.of<HomePageController>(context, listen: true);
+
+    Future<bool> _onWillPop() async {
+      /// check if user is on main page of home screen
+      /// if yes then return true
+      /// else set the _current index to 0
+
+      if (homePageProvider.currentIndex != 0) {
+        homePageProvider.changeIndex(0);
+        return false;
+      } else {
+        return true;
+      }
+    }
+
     return ThemeSwitchingArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Home page"),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 50,
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: Scaffold(
+          appBar: appBars[homePageProvider.currentIndex],
+          drawer: Drawer(
+// Add a ListView to the drawer. This ensures the user can scroll
+// through the options in the drawer if there isn't enough vertical
+// space to fit everything.
+            child: ListView(
+// Important: Remove any padding from the ListView.
+              padding: EdgeInsets.zero,
+              children: [
+                const DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                  ),
+                  child: Text('Drawer Header'),
+                ),
+                ListTile(
+                  title: const Text('Go to settings'),
+                  onTap: () {
+                    context.goNamed(allRoutes[AppPaths.settings]!);
+// Update the state of the app.
+// ...
+                  },
+                ),
+                ListTile(
+                  title: const Text('Go to about'),
+                  onTap: () {
+                    context.goNamed(allRoutes[AppPaths.about]!);
+// Update the state of the app.
+// ...
+                  },
+                ),
+              ],
             ),
-            Text(locator<SharedPreferencesHelper>().getAnonymousLogIn() ? "true anonymous" : "false anonymous"),
-            Text(locator<SharedPreferencesHelper>().getUserToken() ?? "no token available "),
-            SizedBox(
-              height: 50,
-            ),
-            TextButton(
-                onPressed: () {
-                  /// here I have to clean all sharedPrefs values except isFirstTime and then remove all views from the
-                  /// stack and redirect user to LogIn Page
-                  locator<SharedPreferencesHelper>().clearPreferenceValuesExceptWelcome().then((value) {
-                    if (value) {
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error")));
-                    }
-                  });
-                },
-                child: Text("Log Out")),
-            SizedBox(
-              height: 100,
-            ),
-            ThemeIconsTray()
-          ],
+          ),
+
+          /// here a Page view can also be used instead of Indexed Stack and that will give us the ability to
+          /// navigate between homepage sections by swiping
+          /// for that we will have to utilize AutomaticKeepAliveClientMixin
+          body: IndexedStack(
+            index: homePageProvider.currentIndex,
+            children: [
+              HomePageSection1(),
+              HomePageSection2(),
+              HomePageSection3(),
+              HomePageSection4(),
+            ],
+          ),
+          // body: Column(
+          //   children: [
+          //     SizedBox(
+          //       height: 50,
+          //     ),
+          //     Text(locator<SharedPreferencesHelper>().getAnonymousLogIn() ? "true anonymous" : "false anonymous"),
+          //     Text(locator<SharedPreferencesHelper>().getUserToken() ?? "no token available "),
+          //     SizedBox(
+          //       height: 50,
+          //     ),
+          //     TextButton(
+          //         onPressed: () {
+          //           /// here I have to clean all sharedPrefs values except isFirstTime and then remove all views from the
+          //           /// stack and redirect user to LogIn Page
+          //           locator<SharedPreferencesHelper>().clearPreferenceValuesExceptWelcome().then((value) {
+          //             if (value) {
+          //               Navigator.of(context).pushAndRemoveUntil(
+          //                   MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
+          //             } else {
+          //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error")));
+          //             }
+          //           });
+          //         },
+          //         child: Text("Log Out")),
+          //     SizedBox(
+          //       height: 100,
+          //     ),
+          //     ThemeIconsTray()
+          //   ],
+          // ),
+          bottomNavigationBar: BottomNavigationBar(
+            elevation: 0.6,
+            backgroundColor: Colors.deepPurple,
+            currentIndex: homePageProvider.currentIndex, //New
+            onTap: homePageProvider.changeIndex,
+            //     (index){
+            //   homePageProvider.changeIndex(index);
+            // },
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Calls',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.explore_outlined),
+                label: 'Explore',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.favorite),
+                label: 'Activity',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class HomePage2 extends StatelessWidget {
-  const HomePage2({Key? key}) : super(key: key);
+// class HomePageSection1 extends StatelessWidget {
+//   const HomePageSection1({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       color: Colors.green,
+//     );
+//   }
+// }
+//
+// class HomePageSection2 extends StatelessWidget {
+//   const HomePageSection2({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       color: Colors.yellow,
+//     );
+//   }
+// }
+//
+// class HomePageSection3 extends StatelessWidget {
+//   const HomePageSection3({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       color: Colors.redAccent,
+//     );
+//   }
+// }
+//
+// class HomePageSection4 extends StatelessWidget {
+//   const HomePageSection4({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       color: Colors.blue,
+//     );
+//   }
+// }
+
+List<PreferredSizeWidget> appBars = [AppBar1(), AppBar2(), AppBar3(), AppBar4()];
+
+class AppBar1 extends StatelessWidget implements PreferredSizeWidget {
+  const AppBar1({Key? key}) : super(key: key);
+
+  @override
+  Size get preferredSize => Size.fromHeight(60);
 
   @override
   Widget build(BuildContext context) {
-    return ThemeSwitchingArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Home page 2"),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 50,
-            ),
-            Text(locator<SharedPreferencesHelper>().getAnonymousLogIn() ? "true anonymous" : "false anonymous"),
-            Text(locator<SharedPreferencesHelper>().getUserToken() ?? "no token available "),
-            SizedBox(
-              height: 50,
-            ),
-            TextButton(
-                onPressed: () {
-                  /// here I have to clean all sharedPrefs values except isFirstTime and then remove all views from the
-                  /// stack and redirect user to LogIn Page
-                  locator<SharedPreferencesHelper>().clearPreferenceValuesExceptWelcome().then((value) {
-                    if (value) {
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error")));
-                    }
-                  });
-                },
-                child: Text("Log Out")),
-            SizedBox(
-              height: 100,
-            ),
-            ThemeIconsTray()
-          ],
+    return AppBar(
+      title: Text("Home page section 1"),
+      centerTitle: true,
+      actions: [
+        IconButton(
+            onPressed: () {
+              context.goNamed(allRoutes[AppPaths.cart]!);
+            },
+            icon: Icon(Icons.add_shopping_cart))
+      ],
+    );
+  }
+}
+
+class AppBar2 extends StatelessWidget implements PreferredSizeWidget {
+  const AppBar2({Key? key}) : super(key: key);
+
+  @override
+  Size get preferredSize => Size.fromHeight(60);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Text("Home page section 2"),
+      centerTitle: true,
+      actions: [
+        IconButton(
+            onPressed: () {
+              context.goNamed(allRoutes[AppPaths.cart]!);
+            },
+            icon: Icon(Icons.add_shopping_cart))
+      ],
+    );
+  }
+}
+
+class AppBar3 extends StatelessWidget implements PreferredSizeWidget {
+  const AppBar3({Key? key}) : super(key: key);
+
+  @override
+  Size get preferredSize => Size.fromHeight(60);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Text("Home page section 3"),
+      centerTitle: true,
+      actions: [
+        IconButton(
+            onPressed: () {
+              context.goNamed(allRoutes[AppPaths.cart]!);
+            },
+            icon: Icon(Icons.add_shopping_cart))
+      ],
+    );
+  }
+}
+
+class AppBar4 extends StatelessWidget implements PreferredSizeWidget {
+  const AppBar4({Key? key}) : super(key: key);
+
+  @override
+  Size get preferredSize => Size.fromHeight(60);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Text("Home page section 4"),
+      centerTitle: true,
+      actions: [
+        IconButton(
+            onPressed: () {
+              context.goNamed(allRoutes[AppPaths.cart]!);
+            },
+            icon: Icon(Icons.add_shopping_cart))
+      ],
+    );
+  }
+}
+
+class HomePageSection1 extends StatelessWidget {
+  const HomePageSection1({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.green,
+    );
+  }
+}
+
+class HomePageSection2 extends StatelessWidget {
+  const HomePageSection2({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.red,
+      body: Container(
+        child: Center(
+          child: TextButton(
+            onPressed: () {
+              context.pushNamed(allRoutes[AppPaths.cart]!);
+            },
+            child: Text("Go to cart"),
+          ),
         ),
       ),
     );
   }
 }
 
-class HomePage3 extends StatelessWidget {
-  const HomePage3({Key? key}) : super(key: key);
+class HomePageSection3 extends StatelessWidget {
+  const HomePageSection3({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ThemeSwitchingArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Home page 3"),
-          centerTitle: true,
-        ),
-        body: Column(
+    return Container(
+      color: Colors.yellow,
+    );
+  }
+}
+
+class HomePageSection4 extends StatelessWidget {
+  const HomePageSection4({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 50,
+          ),
+          locator<SharedPreferencesHelper>().getIsUserLoggedIn()
+              ? TextButton(
+                  onPressed: () {
+                    context.pushNamed(allRoutes[AppPaths.editprofile]!,
+                        params: <String, String>{'usertoken': locator<SharedPreferencesHelper>().getUserToken()!});
+                  },
+                  child: Text("uer is properly logged in Go to editProfile"))
+              : Text("Not logged in properly"),
+          SizedBox(
+            height: 50,
+          ),
+          locator<SharedPreferencesHelper>().getAnonymousLogIn()
+              ? TextButton(
+                  onPressed: () {
+                    /// we are not pushing user so that he can come back if the changes his mind to logIn
+                    /// and if he logs in then the stack will be rebuilt again with home in root
+                    context.pushNamed(allRoutes[AppPaths.login]!);
+                  },
+                  child: Text("user is anonymously logged in, cant go to edit profile page, logIn properly now? "))
+              : Container(),
+          SizedBox(
+            height: 100,
+          ),
+          TextButton(
+              onPressed: () {
+                locator<SharedPreferencesHelper>().clearPreferenceValuesExceptWelcome().then((value) {
+                  if (value) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Logged out")));
+
+                    context.goNamed(allRoutes[AppPaths.login]!);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error logging out")));
+                  }
+                });
+              },
+              child: Text("LogOut")),
+        ],
+      ),
+    );
+  }
+}
+
+class CartPage extends StatelessWidget {
+  const CartPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Cart Screen"),
+      ),
+    );
+  }
+}
+
+class AboutPage extends StatelessWidget {
+  const AboutPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("About App Screen"),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("SettingsPage Screen"),
+      ),
+    );
+  }
+}
+
+class EditProfilePage extends StatelessWidget {
+  EditProfilePage({Key? key, required this.usertoken}) : super(key: key);
+
+  String? usertoken;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("EditProfilePage Screen"),
+      ),
+      body: Center(
+        child: Column(
           children: [
+            Text("Only is visible if user is properly logged in"),
             SizedBox(
               height: 50,
             ),
-            Text(locator<SharedPreferencesHelper>().getAnonymousLogIn() ? "true anonymous" : "false anonymous"),
-            Text(locator<SharedPreferencesHelper>().getUserToken() ?? "no token available "),
+            Text(usertoken ?? "No user token"),
             SizedBox(
               height: 50,
             ),
-            TextButton(
-                onPressed: () {
-                  /// here I have to clean all sharedPrefs values except isFirstTime and then remove all views from the
-                  /// stack and redirect user to LogIn Page
-                  locator<SharedPreferencesHelper>().clearPreferenceValuesExceptWelcome().then((value) {
-                    if (value) {
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error")));
-                    }
-                  });
-                },
-                child: Text("Log Out")),
-            SizedBox(
-              height: 100,
-            ),
-            ThemeIconsTray()
           ],
         ),
       ),

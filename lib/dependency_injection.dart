@@ -14,11 +14,17 @@ setUpDependencies() async {
 
   // register services and repositories as singletons
   locator.registerSingleton(SharedPreferencesHelper());
+
+  /// this is a initialization and should go into main() method but its an exception
+  /// we are registering the helper class here therefore doing the initialization here
+  /// instead of doing at some other place and increase chance of forgetting stuff
+  /// in case we have to remove this helper service file ..
   await locator<SharedPreferencesHelper>().initPrefs();
 
   // register controllers as factories
   locator.registerFactory<HomePageController>(() => HomePageController());
 
-  print("haha now removing native splash ");
+  /// after dependency injection, native splash is removed
+  /// read for more
   FlutterNativeSplash.remove();
 }
