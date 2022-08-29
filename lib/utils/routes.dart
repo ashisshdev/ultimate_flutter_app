@@ -39,6 +39,8 @@ final Map<AppPaths, String> allRoutes = {
 final goRouter = GoRouter(
   /// all absolute paths (starting paths home,welcome,login)should start with a '/' and sub paths have to avoid it
 
+  /// If I want to implement a page transition animation then I have to use pageBuilder instead of builder in GoRouter()
+
   debugLogDiagnostics: true,
   initialLocation: locator<SharedPreferencesHelper>().getIsUserFirstTime()
       ? '/${allRoutes[AppPaths.welcome]}'
@@ -71,17 +73,18 @@ final goRouter = GoRouter(
           GoRoute(
             name: allRoutes[AppPaths.cart],
             path: '${allRoutes[AppPaths.cart]}',
-            builder: (context, state) => const CartPage(),
+            pageBuilder: (context, state) => FadingPageTransition(child: const CartPage()),
           ),
           GoRoute(
             name: allRoutes[AppPaths.settings],
             path: '${allRoutes[AppPaths.settings]}',
-            builder: (context, state) => const SettingsPage(),
+            pageBuilder: (context, state) => CustomFadeAndScaleTransition(child: const SettingsPage()),
           ),
           GoRoute(
             name: allRoutes[AppPaths.about],
             path: '${allRoutes[AppPaths.about]}',
-            builder: (context, state) => const AboutPage(),
+            pageBuilder: (context, state) =>
+                SlidingPageTransition(direction: AxisDirection.left, child: const AboutPage()),
           ),
           GoRoute(
               name: allRoutes[AppPaths.editprofile],
@@ -112,6 +115,7 @@ final goRouter = GoRouter(
 /// I keep forgetting that
 /// go -> removes entire stack and push a new page
 /// push -> stacks new page above current page
+/// replace -> replace current page with new page on current stack
 
 class ErrorPage extends StatelessWidget {
   const ErrorPage({Key? key}) : super(key: key);
@@ -131,4 +135,77 @@ class ErrorPage extends StatelessWidget {
       )),
     );
   }
+}
+
+/// custom page transition animations
+Offset getOffset(AxisDirection direction) {
+  switch (direction) {
+    case AxisDirection.up:
+      return const Offset(0, 1);
+    case AxisDirection.down:
+      return const Offset(0, -1);
+    case AxisDirection.right:
+      return const Offset(-1, 0);
+    case AxisDirection.left:
+      return const Offset(1, 0);
+    default:
+      return const Offset(1, 0);
+  }
+}
+
+final tween = Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.ease));
+
+class FadingPageTransition extends CustomTransitionPage<void> {
+  FadingPageTransition({
+    required Widget child,
+  }) : super(
+            transitionsBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation, Widget child) =>
+                FadeTransition(
+                  opacity: animation.drive(_curveTween),
+                  child: child,
+                ),
+            child: child);
+
+  static final CurveTween _curveTween = CurveTween(curve: Curves.easeIn);
+}
+
+class SlidingPageTransition extends CustomTransitionPage<void> {
+  final AxisDirection direction;
+
+  SlidingPageTransition({
+    required this.direction,
+    required Widget child,
+  }) : super(
+            transitionsBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation, Widget child) =>
+                SlideTransition(
+                  position: Tween<Offset>(begin: getOffset(direction), end: Offset.zero).animate(animation),
+                  child: child,
+                ),
+            child: child);
+}
+
+class CustomFadeAndScaleTransition extends CustomTransitionPage<void> {
+  CustomFadeAndScaleTransition({required Widget child})
+      : super(
+            transitionsBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation, Widget child) =>
+                ScaleTransition(scale: animation.drive(tween), child: FadeTransition(opacity: animation, child: child)),
+            child: child);
+}
+
+/// can be used in case of dialog boxes ??
+class CustomScaleTransition extends PageRouteBuilder {
+  final Widget child;
+
+  CustomScaleTransition({required this.child})
+      : super(
+            transitionDuration: const Duration(seconds: 2),
+            pageBuilder: (context, animation, secondaryAnimation) => child);
+
+  @override
+  Widget buildTransitions(
+          BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
+      ScaleTransition(scale: animation, child: child);
 }

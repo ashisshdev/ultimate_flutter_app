@@ -129,6 +129,7 @@ class LoginPage extends StatelessWidget {
                           locator<SharedPreferencesHelper>().setAnonymousLogIn(loggedIn: false);
                           locator<SharedPreferencesHelper>().setUserToken("someUserToken").then((value) {
                             if (value) {
+                              Provider.of<HomePageController>(context, listen: false).changeIndex(0);
                               context.goNamed(allRoutes[AppPaths.home]!);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -267,11 +268,7 @@ class HomePage extends StatelessWidget {
         child: Scaffold(
           appBar: appBars[homePageProvider.currentIndex],
           drawer: Drawer(
-// Add a ListView to the drawer. This ensures the user can scroll
-// through the options in the drawer if there isn't enough vertical
-// space to fit everything.
             child: ListView(
-// Important: Remove any padding from the ListView.
               padding: EdgeInsets.zero,
               children: [
                 const DrawerHeader(
@@ -284,16 +281,15 @@ class HomePage extends StatelessWidget {
                   title: const Text('Go to settings'),
                   onTap: () {
                     context.goNamed(allRoutes[AppPaths.settings]!);
-// Update the state of the app.
-// ...
                   },
                 ),
                 ListTile(
                   title: const Text('Go to about'),
                   onTap: () {
                     context.goNamed(allRoutes[AppPaths.about]!);
-// Update the state of the app.
-// ...
+
+                    /// on web, the drawer does not go back when we click on one of its item
+                    /// so this next line will ensure that
                   },
                 ),
               ],
@@ -312,36 +308,6 @@ class HomePage extends StatelessWidget {
               HomePageSection4(),
             ],
           ),
-          // body: Column(
-          //   children: [
-          //     SizedBox(
-          //       height: 50,
-          //     ),
-          //     Text(locator<SharedPreferencesHelper>().getAnonymousLogIn() ? "true anonymous" : "false anonymous"),
-          //     Text(locator<SharedPreferencesHelper>().getUserToken() ?? "no token available "),
-          //     SizedBox(
-          //       height: 50,
-          //     ),
-          //     TextButton(
-          //         onPressed: () {
-          //           /// here I have to clean all sharedPrefs values except isFirstTime and then remove all views from the
-          //           /// stack and redirect user to LogIn Page
-          //           locator<SharedPreferencesHelper>().clearPreferenceValuesExceptWelcome().then((value) {
-          //             if (value) {
-          //               Navigator.of(context).pushAndRemoveUntil(
-          //                   MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
-          //             } else {
-          //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Some Error")));
-          //             }
-          //           });
-          //         },
-          //         child: Text("Log Out")),
-          //     SizedBox(
-          //       height: 100,
-          //     ),
-          //     ThemeIconsTray()
-          //   ],
-          // ),
           bottomNavigationBar: BottomNavigationBar(
             elevation: 0.6,
             backgroundColor: Colors.deepPurple,
@@ -548,6 +514,12 @@ class HomePageSection3 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.yellow,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ThemeIconsTray(),
+        ],
+      ),
     );
   }
 }

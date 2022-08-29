@@ -5,6 +5,36 @@ A flutter project to display all the aspects of developing applicatins with Flut
 I guess I figured out the ultimate flutter folder structure, data flow and all other stuff. This is a project where i will try implementing everything
 
 
+
+Routes
+SharedPrefs
+AnimatedTheming
+
+APIs 101 (base, exceptions, dartz, repositories , abstractions )
+Authentication - post Method
+get posts - get Method (caching with sqflite)
+post post - post Method
+update user info - Update method
+delete account - delete Method
+
+local Notifications 101
+
+stateManagement with Provider (base controllers with state enum (initial,loading,success,error)
+
+
+after above all Need to change provider with bloc
+and do stateManagement with Bloc 101
+
+only after that I will be able to start working on portfolio level apps !!!
+
+
+
+----
+
+2-3 big apps (with different approaches like provider/bloc, MVVP/packages etc) with tests
+many UIs - lots of UIs
+and 1 miniApps App - apiNinja complete apis - with tests
+
 ----------------
 Notes while implementing animated theme switcher
 
