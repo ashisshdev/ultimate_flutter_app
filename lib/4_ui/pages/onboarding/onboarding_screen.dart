@@ -1,3 +1,57 @@
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../1_services/local/shared_prefs/shared_prefs_helper.dart';
+import '../../../dependency_injection.dart';
+import '../../../utils/routes.dart';
+import '../../shared/themeicon_widget.dart';
+
+class WelcomePage extends StatelessWidget {
+  const WelcomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    /// gotta integrate change theme option in this page flow
+    return ThemeSwitchingArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("welcome page"),
+          centerTitle: true,
+        ),
+        body: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 70),
+              child: Text("HEHE set the shared prefs to is user first time false"),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: TextButton(
+                child: const Text("Move forward now "),
+                onPressed: () async {
+                  await locator<SharedPreferencesHelper>().setIsUserFirstTime().then((value) async {
+                    if (value) {
+                      locator<SharedPreferencesHelper>().getIsUserLoggedIn() ||
+                              locator<SharedPreferencesHelper>().getAnonymousLogIn()
+                          ? context.goNamed(allRoutes[AppPaths.home]!)
+                          : context.goNamed(allRoutes[AppPaths.login]!);
+                    }
+                  });
+                },
+              ),
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            const ThemeIconsTray(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // import 'package:flutter/foundation.dart';
 // import 'package:flutter/material.dart';
 // import 'package:introduction_screen/introduction_screen.dart';

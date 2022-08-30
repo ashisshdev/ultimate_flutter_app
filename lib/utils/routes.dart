@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../1_services/local/shared_prefs/shared_prefs_helper.dart';
+import '../4_ui/pages/auth/auth_screens.dart';
+import '../4_ui/pages/homepage/homepage.dart';
+import '../4_ui/pages/onboarding/onboarding_screen.dart';
 import '../app.dart';
 import '../dependency_injection.dart';
 
