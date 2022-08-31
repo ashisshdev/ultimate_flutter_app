@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ultimate_flutter_app/data/local/shared_prefs/shared_prefs_helper.dart';
+import 'package:ultimate_flutter_app/presentation/ui/pages/auth/login.dart';
+import 'package:ultimate_flutter_app/presentation/ui/pages/auth/signup.dart';
+import 'package:ultimate_flutter_app/presentation/ui/pages/homepage/homepage.dart';
+import 'package:ultimate_flutter_app/presentation/ui/pages/onboarding/onboarding_screen.dart';
 
-import '../1_services/local/shared_prefs/shared_prefs_helper.dart';
-import '../4_ui/pages/auth/auth_screens.dart';
-import '../4_ui/pages/homepage/homepage.dart';
-import '../4_ui/pages/onboarding/onboarding_screen.dart';
 import '../app.dart';
 import '../dependency_injection.dart';
 
@@ -45,9 +46,10 @@ final goRouter = GoRouter(
   /// If I want to implement a page transition animation then I have to use pageBuilder instead of builder in GoRouter()
 
   debugLogDiagnostics: true,
-  initialLocation: locator<SharedPreferencesHelper>().getIsUserFirstTime()
+  initialLocation: locator<SharedPreferencesHelperImpl>().getIsUserFirstTime()
       ? '/${allRoutes[AppPaths.welcome]}'
-      : locator<SharedPreferencesHelper>().getIsUserLoggedIn() || locator<SharedPreferencesHelper>().getAnonymousLogIn()
+      : locator<SharedPreferencesHelperImpl>().getIsUserLoggedIn() ||
+              locator<SharedPreferencesHelperImpl>().getAnonymousLogIn()
           ? '/${allRoutes[AppPaths.home]}'
           : '/${allRoutes[AppPaths.login]}',
   errorBuilder: (context, state) => const ErrorPage(),

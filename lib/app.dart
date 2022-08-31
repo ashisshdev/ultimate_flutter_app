@@ -3,11 +3,12 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ultimate_flutter_app/1_services/local/shared_prefs/shared_prefs_helper.dart';
-import 'package:ultimate_flutter_app/3_controllers/homepage_provider.dart';
-import 'package:ultimate_flutter_app/4_ui/theme/themes_data.dart';
 import 'package:ultimate_flutter_app/dependency_injection.dart';
+import 'package:ultimate_flutter_app/presentation/ui/theme/themes_data.dart';
 import 'package:ultimate_flutter_app/utils/routes.dart';
+
+import 'data/local/shared_prefs/shared_prefs_helper.dart';
+import 'presentation/controllers/homepage_provider.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
 
   /// checking system theme and setting initial theme accordingly because for first time theme data would be null
   getCurrentTheme() {
-    String? themeName = locator<SharedPreferencesHelper>().getTheme();
+    String? themeName = locator<SharedPreferencesHelperImpl>().getTheme();
     if (themeName == null) {
       final isPlatformDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
       themeName = isPlatformDark ? 'light' : 'dark';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         /// this can look tedious here, I can define a list of these providers in dependency_injection.dart file and
         /// provide that list here to make code more readable
         ChangeNotifierProvider<HomePageController>(create: (_) => locator<HomePageController>()),
+        ChangeNotifierProvider(create: (_) => locator<HomePageController>()),
       ],
       child: ThemeProvider(
         initTheme: getCurrentTheme(),
