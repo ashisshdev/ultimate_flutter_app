@@ -4,7 +4,8 @@ import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ultimate_flutter_app/dependency_injection.dart';
-import 'package:ultimate_flutter_app/presentation/ui/theme/themes_data.dart';
+import 'package:ultimate_flutter_app/presentation/controllers/home_section2_provider.dart';
+import 'package:ultimate_flutter_app/presentation/ui/app_theme/themes_data.dart';
 import 'package:ultimate_flutter_app/utils/routes.dart';
 
 import 'data/local/shared_prefs/shared_prefs_helper.dart';
@@ -32,31 +33,31 @@ class MyApp extends StatelessWidget {
       providers: [
         /// this can look tedious here, I can define a list of these providers in dependency_injection.dart file and
         /// provide that list here to make code more readable
-        ChangeNotifierProvider<HomePageController>(create: (_) => locator<HomePageController>()),
         ChangeNotifierProvider(create: (_) => locator<HomePageController>()),
+        ChangeNotifierProvider(create: (_) => locator<HomeSection2Controller>()),
       ],
       child: ThemeProvider(
         initTheme: getCurrentTheme(),
         builder: (_, theme) {
           return MaterialApp.router(
-              routeInformationParser: goRouter.routeInformationParser,
-              routerDelegate: goRouter.routerDelegate,
-              routeInformationProvider: goRouter.routeInformationProvider,
-              theme: theme
+            routeInformationParser: goRouter.routeInformationParser,
+            routerDelegate: goRouter.routerDelegate,
+            routeInformationProvider: goRouter.routeInformationProvider,
+            theme: theme,
 
-              /// integrate custom route transitions here in theming
-              /// https://medium.com/geekculture/defining-custom-page-transitions-in-flutter-e2972a464be
+            /// integrate custom route transitions here in theming
+            /// https://medium.com/geekculture/defining-custom-page-transitions-in-flutter-e2972a464be
 
-              /// now here we will decide if user is first time and loggedIn or anonynosmy loggedIn or what
-              /// and we will show on-boarding or homescreen or accordingly
-              /// but first routes !!
-              // home: locator<SharedPreferencesHelper>().getIsUserFirstTime()
-              //     ? WelcomePage()
-              //     : locator<SharedPreferencesHelper>().getIsUserLoggedIn() ||
-              //             locator<SharedPreferencesHelper>().getAnonymousLogIn()
-              //         ? HomePage()
-              //         : LoginPage()
-              );
+            /// now here we will decide if user is first time and loggedIn or anonynosmy loggedIn or what
+            /// and we will show on-boarding or homescreen or accordingly
+            /// but first routes !!
+            // home: locator<SharedPreferencesHelper>().getIsUserFirstTime()
+            //     ? WelcomePage()
+            //     : locator<SharedPreferencesHelper>().getIsUserLoggedIn() ||
+            //             locator<SharedPreferencesHelper>().getAnonymousLogIn()
+            //         ? HomePage()
+            //         : LoginPage()
+          );
         },
       ),
     );

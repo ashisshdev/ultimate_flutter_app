@@ -27,7 +27,7 @@ setUpDependencies() async {
   locator.registerLazySingleton<Server>(() => Server());
 
   /// actual services
-  locator.registerSingleton<SharedPreferencesHelper>(SharedPreferencesHelperImpl()); // no good in lazy registration
+  locator.registerSingleton<SharedPreferencesHelperImpl>(SharedPreferencesHelperImpl()); // no good in lazy registration
   // it will be used as soon as app is opened
   /// this is a initialization and should go into main() method but its an exception
   /// we are registering the helper class here therefore doing the initialization here
@@ -35,15 +35,23 @@ setUpDependencies() async {
   /// in case we have to remove this helper service file ..
   await locator<SharedPreferencesHelperImpl>().initPrefs();
 
-  locator.registerLazySingleton<SomeApiService>(() => SomeApiServiceImpl());
+  locator.registerSingleton<SomeApiServiceImpl>(SomeApiServiceImpl());
 
   /// repositories
-  locator.registerLazySingleton<SomeRepository>(() => SomeRepositoryImpl(locator(), locator()));
+  locator.registerSingleton<SomeRepositoryImpl>(
+      SomeRepositoryImpl(someApiServiceImpl: locator(), sharedPreferencesHelperImpl: locator()));
+
+  // locator.registerLazySingleton<SomeRepository>(
+  //   () => SomeRepositoryImpl(
+  //     sharedPreferencesHelperImpl: locator(),
+  //     someApiServiceImpl: locator(),
+  //   ),
+  // );
 
   /// controllers
   locator.registerFactory<HomePageController>(() => HomePageController());
 
-  locator.registerFactory<HomeSection2Controller>(() => HomeSection2Controller(locator()));
+  locator.registerFactory<HomeSection2Controller>(() => HomeSection2Controller(someRepositoryImpl: locator()));
 
   /// after dependency injection, native splash is removed
   /// read for more

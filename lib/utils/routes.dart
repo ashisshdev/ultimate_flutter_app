@@ -42,7 +42,6 @@ final Map<AppPaths, String> allRoutes = {
 
 final goRouter = GoRouter(
   /// all absolute paths (starting paths home,welcome,login)should start with a '/' and sub paths have to avoid it
-
   /// If I want to implement a page transition animation then I have to use pageBuilder instead of builder in GoRouter()
 
   debugLogDiagnostics: true,

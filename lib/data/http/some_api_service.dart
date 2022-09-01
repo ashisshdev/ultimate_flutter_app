@@ -41,6 +41,7 @@ class SomeApiServiceImpl implements SomeApiService {
   /// some random api get functions
   @override
   Future<Either<Exception, http.Response>> getDataSuccess1() async {
+    print("\nrunning success get method 1 api service class ");
     return await _server.get(baseUrl, "users/2");
   }
 
@@ -58,7 +59,7 @@ class SomeApiServiceImpl implements SomeApiService {
   @override
   Future<Either<Exception, http.Response>> getDataFailure2() async {
     // no such endpoint exist so it will throw error
-    return await _server.get(baseUrl, "hehe");
+    return await _server.get("https://reqres.in/sheesh/api/lmao/hehe/", "heheh");
   }
 
   @override
@@ -113,7 +114,7 @@ class SomeApiServiceImpl implements SomeApiService {
   @override
   Future<Either<Exception, http.Response>> updateDataFailure1() async {
     // passing wrong key value in payload
-    var payload = {"name": "morpheus", "jobie": "lmao"};
+    var payload = {"name": "morpheus", "___": "lmao"};
     return await _server.update(baseUrl, "users/2", payload);
   }
 
@@ -134,7 +135,7 @@ class SomeApiServiceImpl implements SomeApiService {
   @override
   Future<Either<Exception, http.Response>> deleteDataFailure() async {
     // passing wrong end point
-    var payload = {};
+    var payload;
     return await _server.delete(baseUrl, "lmao/2", payload);
   }
 }

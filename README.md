@@ -31,7 +31,8 @@ only after that I will be able to start working on portfolio level apps !!!
 
 ----
 
-2-3 big apps (with different approaches like provider/bloc, MVVP/packages etc) with tests
+2-3 big apps (with different approaches like provider/bloc, MVVP/packages etc) with tests (1 with
+ hive and other with shared_prefs )
 many UIs - lots of UIs
 and 1 miniApps App - apiNinja complete apis - with tests
 
