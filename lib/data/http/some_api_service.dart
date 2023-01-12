@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../flutter-advance-concepts/bloc_is_nice/lib/data/http/helper/base_http.dart';
 import '../../dependency_injection.dart';
-import 'helper/base_http.dart';
 
 abstract class SomeApiService {
   /// get method

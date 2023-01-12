@@ -37,6 +37,29 @@ many UIs - lots of UIs
 and 1 miniApps App - apiNinja complete apis - with tests
 
 ----------------
+
+API Error handling should be done in the respective api service classes because a base server
+cannot serve the needs of all kinds of apis
+suppose we are using multiple api (microservice) and in that case everyone have a diferent style
+of sending error reposnses like
+case 1 - {status : 404,message : "Resource not found"}
+case 2 - {description : "Some error at backend"}
+
+so to prevent any unwanted experiences we will be doing error handling in respective
+api_service classes
+like auth-_service
+posts_service
+profile_services etc..
+
+for reference
+https://dummy.restapiexample.com/api/v1/employee/1
+https://dummyapis.com/dummy/http-status-codes?queryParameters=123
+https://jsonplaceholder.typicode.com/commentsdfa
+https://dummyapi.io/data/v1/posts
+https://dummyjson.com/products/af
+
+
+---------------
 Notes while implementing animated theme switcher
 
 1 get current system theme by checking brightness of the app

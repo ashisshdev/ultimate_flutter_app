@@ -4,7 +4,7 @@ import 'package:ultimate_flutter_app/data/http/some_api_service.dart';
 import 'package:ultimate_flutter_app/presentation/controllers/home_section2_provider.dart';
 import 'package:ultimate_flutter_app/presentation/controllers/homepage_provider.dart';
 
-import 'data/http/helper/base_http.dart';
+import '../../flutter-advance-concepts/bloc_is_nice/lib/data/http/helper/base_http.dart';
 import 'data/local/shared_prefs/shared_prefs_helper.dart';
 import 'domain/repositories/some_api_service_repository.dart';
 

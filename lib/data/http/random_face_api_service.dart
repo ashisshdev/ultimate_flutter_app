@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 
-import 'helper/base_http.dart';
+import '../../../../flutter-advance-concepts/bloc_is_nice/lib/data/http/helper/base_http.dart';
 
 abstract class RandomFaceApiService {
   Future<Either<Exception, http.Response>> fetchRandomFace();

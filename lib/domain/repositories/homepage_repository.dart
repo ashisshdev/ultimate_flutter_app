@@ -12,6 +12,6 @@ class HomeRepoImpl implements HomeRepo {
 
   @override
   Future<Either<Exception, http.Response>> getARandomFace() async {
-    return await _randomFaceApiService.fetchRandomFace();
+    await _randomFaceApiService.fetchRandomFace();
   }
 }
